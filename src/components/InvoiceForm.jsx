@@ -60,6 +60,7 @@ const InvoiceForm = () => {
 
     const newItems = items.map((item) => {
       for (var key in item) {
+        console.log(item.id === editedItem.id);
         if (item.id === editedItem.id) {
           item[key] === editedItem.value;
         }
