@@ -19,7 +19,7 @@ const EditableItem = ({ currency, cellData, handleEditItem }) => {
         max={cellData.max}
         step={cellData.step}
         name={cellData.name}
-        id={cellData.id}
+        // id={cellData.id}
         value={cellData.value}
         onChange={handleEditItem}
         required

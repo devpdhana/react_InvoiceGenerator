@@ -5,16 +5,23 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import InvoiceItem from "./InvoiceItem";
+import { Button, InputGroup } from "react-bootstrap";
+import InvoiceModel from "./reusable/InvoiceModel";
 
 const InvoiceForm = () => {
+  const [isOpen,setIsOpen] = useState(false)
   const [invoiceNumber, setInvoiceNumber] = useState(1);
-  const [taxRate, setTaxRate] = useState();
+  const [tax, setTax] = useState(0);
   const [taxAmount, setTaxAmount] = useState();
-  const [discountRate, setDiscountRate] = useState();
+  const [discount, setDiscount] = useState(0);
   const [discountAmount, setDiscountAmount] = useState();
   const [customurName, setCustomurName] = useState("");
   const [customurEmail, setCustomurEmail] = useState("");
   const [customurAddress, setCustomurAddress] = useState("");
+
+
+  const [subTotal,setSubTotal] = useState('1.00')
+  // const [total,setTotal] = useState('0.00')
 
   //    const [itemName,setItemName] = useState('ddddd')
 
@@ -24,10 +31,39 @@ const InvoiceForm = () => {
     {
       id: 1,
       name: "",
-      price: "1.00",
+      price: 1.00,
       quantity: 1,
     },
   ]);
+
+
+
+
+  const subtotal = items.reduce((prev, curr) => {
+    if (curr.name.trim().length > 0) {
+      return prev + curr.price * curr.quantity;
+    }
+    return prev;
+  }, 0);
+
+
+  // const sub = items.map((item)=>{
+  //   return item.price * item.quantity; 
+  // })
+
+  const subCalculate = () => {
+    let totalCost = 0;
+    for (const item of items) {
+      totalCost += item.price * item.quantity;
+    }
+    return totalCost;
+  };
+  const sub = subCalculate()
+
+  const taxRate = (tax * sub) / 100;
+  const discountRate = (discount * sub) / 100;
+  const total = sub - discountRate + taxRate;
+
 
   const handleAddItem = () => {
     const id = items.length + 1;
@@ -35,7 +71,7 @@ const InvoiceForm = () => {
     const newItem = {
       id,
       name: "",
-      price: "1.00",
+      price: 1,
       quantity: 1,
     };
 
@@ -50,30 +86,45 @@ const InvoiceForm = () => {
     setItems(newItems);
   };
 
-  const handleEditItem = (event) => {
-    const editedItem = {
-      id: event.target.id,
-      name: event.target.name,
-      value: event.target.value,
-    };
-    console.log(editedItem);
+  // const handleEditItem = (event) => {
+  //   const editedItem = {
+  //     id: event.target.id,
+  //     name: event.target.name,
+  //     value: event.target.value,
+  //   };
+  //   console.log(editedItem);
 
-    const newItems = items.map((item) => {
-      for (var key in item) {
-        console.log(item.id === editedItem.id);
-        if (item.id === editedItem.id) {
-          item[key] === editedItem.value;
-        }
+  //   const newItems = items.map((item) => {
+  //     for (var key in item) {
+  //       console.log(item.id === editedItem.id);
+  //       if (item.id === editedItem.id) {
+  //         item[key] === editedItem.value;
+  //       }
+  //     }
+  //     return item;
+  //   });
+  
+  //   console.log(newItems);
+  //   setItems(newItems);
+  // };
+
+  const handleEditItem = (event, itemId, field) => {
+    const updatedItems = items.map((item) => {
+      if (item.id === itemId) {
+        return {
+          ...item,
+          [field]: event.target.value,
+        };
       }
       return item;
     });
-    console.log(newItems);
-    setItems(newItems);
+
+    setItems(updatedItems);
   };
 
   const currency = "$";
   return (
-    <di>
+    <div>
       <Form onSubmit={(e) => e.preventDefault()}>
         <Row>
           <Col md={8} lg={9}>
@@ -93,6 +144,7 @@ const InvoiceForm = () => {
                 <Col>
                   <Form.Label className="fw-bold">Customur Details</Form.Label>
                   <Form.Control
+                  name= "name"
                     className="mt-3 bg-light"
                     type="text"
                     placeholder="name"
@@ -100,6 +152,7 @@ const InvoiceForm = () => {
                     onChange={(e) => setCustomurName(e.target.value)}
                   />
                   <Form.Control
+                  name = "email"
                     className="mt-3"
                     type="text"
                     placeholder="email"
@@ -107,6 +160,7 @@ const InvoiceForm = () => {
                     onChange={(e) => setCustomurEmail(e.target.value)}
                   />
                   <Form.Control
+                  name = "address"
                     className="mt-3"
                     type="text"
                     placeholder="address"
@@ -117,18 +171,21 @@ const InvoiceForm = () => {
                 <Col>
                   <Form.Label className="fw-bold">Vendor Details</Form.Label>
                   <Form.Control
+                  name = "name"
                     className="mt-3"
                     type="text"
                     value={"Sathish xerox"}
                     disabled={true}
                   />
                   <Form.Control
+                  name = "email"
                     className="mt-3"
                     type="text"
                     value={"sathish@gmail.com"}
                     disabled={true}
                   />
                   <Form.Control
+                  name = "address"
                     className="mt-3"
                     type="text"
                     value={"Tamilnadu"}
@@ -145,11 +202,144 @@ const InvoiceForm = () => {
                 handleDeleteItem={handleDeleteItem}
                 handleEditItem={handleEditItem}
               />
+
+              <Row className="mt-4 justify-content-end">
+                <Col lg={6}>
+                  <div className="d-flex flex-row align-items-start justify-content-between">
+                    <span className="fw-bold">Subtotal:</span>
+                    <span>
+                      {currency}
+                      {sub}
+                    </span>
+                  </div>
+                  <div className="d-flex flex-row align-items-start justify-content-between mt-2">
+                    <span className="fw-bold">Discount:</span>
+                    <span>
+                      <span className="small ">({discount || 0}%)</span>
+                      {currency}
+                      {discountRate || 0}
+                    </span>
+                  </div>
+                  <div className="d-flex flex-row align-items-start justify-content-between mt-2">
+                    <span className="fw-bold">Tax:</span>
+                    <span>
+                      <span className="small ">({tax || 0}%)</span>
+                      {currency}
+                      {taxRate || 0}
+                    </span>
+                  </div>
+                  <hr />
+                  <div
+                    className="d-flex flex-row align-items-start justify-content-between"
+                    style={{
+                      fontSize: "1.125rem",
+                    }}
+                  >
+                    <span className="fw-bold">Total:</span>
+                    <span className="fw-bold">
+                      {currency}
+                      {total || 0}
+                    </span>
+                  </div>
+                </Col>
+              </Row>
             </Card>
           </Col>
+
+          <Col md={4} lg={3}>
+            <div className="sticky-top pt-md-3 pt-xl-4">
+              <Button variant="primary" type="submit" className="d-block w-100" onClick={()=>setIsOpen(true)}>
+                Review Invoice
+              </Button>
+              {/* <InvoiceModal
+                showModal={this.state.isOpen}
+                closeModal={this.closeModal}
+                info={this.state}
+                items={this.state.items}
+                currency={this.state.currency}
+                subTotal={this.state.subTotal}
+                taxAmmount={this.state.taxAmmount}
+                discountAmmount={this.state.discountAmmount}
+                total={this.state.total}
+              /> */}
+              <Form.Group className="mb-5 mt-3">
+                <Form.Label className="fw-bold">Currency:</Form.Label>
+                <Form.Select
+                  // onChange={(event) =>
+                  //   this.onCurrencyChange({ currency: event.target.value })
+                  // }
+                  className="btn btn-light my-1"
+                  name = "currency"
+                  aria-label="Change Currency"
+                >
+                  <option value="$">USD (United States Dollar)</option>
+                  <option value="£">GBP (British Pound Sterling)</option>
+                  <option value="¥">JPY (Japanese Yen)</option>
+                  <option value="$">CAD (Canadian Dollar)</option>
+                  <option value="$">AUD (Australian Dollar)</option>
+                  <option value="$">SGD (Signapore Dollar)</option>
+                  <option value="¥">CNY (Chinese Renminbi)</option>
+                  <option value="₿">BTC (Bitcoin)</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="my-3">
+                <Form.Label className="fw-bold">Tax rate:</Form.Label>
+                <InputGroup className="my-1 flex-nowrap">
+                  <Form.Control
+                    name="taxRate"
+                    type="number"
+                    value={tax}
+                    onChange={(event) => setTax(event.target.value)}
+                    className="bg-white border"
+                    placeholder="0.0"
+                    min="0.00"
+                    step="0.01"
+                    max="100.00"
+                  />
+                  <InputGroup.Text className="bg-light fw-bold text-secondary small">
+                    %
+                  </InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+              <Form.Group className="my-3">
+                <Form.Label className="fw-bold">Discount rate:</Form.Label>
+                <InputGroup className="my-1 flex-nowrap">
+                  <Form.Control
+                    name="discountRate"
+                    type="number"
+                    value={discount}
+                    onChange={(event) => setDiscount(event.target.value)}
+                    className="bg-white border"
+                    placeholder="0.0"
+                    min="0.00"
+                    step="0.01"
+                    max="100.00"
+                  />
+                  <InputGroup.Text className="bg-light fw-bold text-secondary small">
+                    %
+                  </InputGroup.Text>
+                </InputGroup>
+              </Form.Group>
+            </div>
+          </Col>
+
+          <InvoiceModel 
+          isOpen= {isOpen}
+          billFrom = {"Sathish"}
+          invoiceNumber= {invoiceNumber}
+          currency = {currency}
+          total={total}
+          items= {items}
+          customurName={customurName}
+          customurEmail={customurEmail}
+          customurAddress={customurAddress}
+          subTotal={subTotal}
+          taxRate= {taxRate}
+          discountRate={discountRate}
+          setIsOpen= {setIsOpen}/>
         </Row>
       </Form>
-    </di>
+    </div>
   );
 };
 

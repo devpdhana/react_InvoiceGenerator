@@ -20,7 +20,7 @@ const ItemRow = ({
     <tr>
       <td>
         <EditableItem
-          handleEditItem={(event) => handleEditItem(event)}
+          handleEditItem={(event) => handleEditItem(event, id, "name")}
           cellData={{
             placeholder: "Item name",
             type: "text",
@@ -32,7 +32,7 @@ const ItemRow = ({
       </td>
       <td>
         <EditableItem
-          handleEditItem={(event) => handleEditItem(event)}
+          handleEditItem={(event) => handleEditItem(event, id, "quantity")}
           cellData={{
             type: "number",
             name: "quantity",
@@ -45,7 +45,7 @@ const ItemRow = ({
       <td>
         <EditableItem
           currency={currency}
-          handleEditItem={(event) => handleEditItem(event)}
+          handleEditItem={(event) => handleEditItem(event, id, "price")}
           cellData={{
             type: "number",
             min: "0.01",
