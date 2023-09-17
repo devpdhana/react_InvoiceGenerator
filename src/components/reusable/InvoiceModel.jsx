@@ -1,5 +1,8 @@
-import React from 'react'
-import { Col, Modal, Row, Table } from 'react-bootstrap';
+import React, { useContext } from 'react'
+import { Button, Col, Modal, Row, Table } from 'react-bootstrap';
+import html2canvas from 'html2canvas'
+import jspdf, { jsPDF } from 'jspdf'
+import DataContext from '../context/DataContext';
 
 const InvoiceModel = ({
   isOpen,
@@ -16,10 +19,26 @@ const InvoiceModel = ({
   total,
   setIsOpen
 }) => {
+  const generateInvoice = ()=>{
+    html2canvas(document.querySelector("#invoiceCapture")).then((canvas)=>{
+      const imgData = canvas.toDataURL('image/PNG',1.0)
+      const pdfData = jsPDF({
+        orientation:"protait",
+        unit : "pt",
+        format : [612,792]
+      })
+      pdfData.internal.scaleFactor = 1
+      const imgProps = pdfData.getImageProperties(imgData)
+      const pdfWidth = pdfData.internal.pageSize.getWidth()
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+      pdfData.addImage(imgData,"PNG",0,0,pdfWidth,pdfHeight)
+      pdfData.save("invoice.pdf")
+    })
+  }
   return (
     <div>
-      <div onClick={()=>setIsOpen(false)}>
-        <Modal show={isOpen} onHide={isOpen} size="lg" centered>
+      <div >
+        <Modal show={isOpen} onHide={()=>setIsOpen(false)} size="lg" centered>
           <div id="invoiceCapture">
             <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
               <div className="w-100">
@@ -52,7 +71,7 @@ const InvoiceModel = ({
                 </Col>
                 <Col md={4}>
                   <div className="fw-bold mt-2">Date Of Issue:</div>
-                  <div>{new Date().toLocaleDateString || ""}</div>
+                  <div>{new Date().toLocaleDateString() || ""}</div>
                 </Col>
               </Row>
               <Table className="mb-0">
@@ -162,6 +181,8 @@ const InvoiceModel = ({
               </Col>
             </Row> */}
           </div>
+
+          <Button className='m-3' onClick={()=>generateInvoice()}>Download Invoice</Button>
         </Modal>
         <hr className="mt-4 mb-3" />
       </div>

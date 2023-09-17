@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
@@ -6,16 +6,10 @@ import { BiTrash } from "react-icons/bi";
 
 import EditableItem from "./reusable/EditableItem";
 
-const ItemRow = ({
-  id,
-  name,
-  quantity,
-  price,
-  item,
-  currency,
-  handleDeleteItem,
-  handleEditItem,
-}) => {
+import DataContext from "./context/DataContext";
+
+const ItemRow = ({id,name,item,quantity,price,currency,handleDeleteItem,handleEditItem}) => {
+
   return (
     <tr>
       <td>
