@@ -6,7 +6,6 @@ import { BiTrash } from "react-icons/bi";
 
 import EditableItem from "./reusable/EditableItem";
 
-import DataContext from "./context/DataContext";
 
 const ItemRow = ({id,name,item,quantity,price,currency,handleDeleteItem,handleEditItem}) => {
 

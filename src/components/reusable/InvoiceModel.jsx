@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { Button, Col, Modal, Row, Table } from 'react-bootstrap';
 import html2canvas from 'html2canvas'
 import jspdf, { jsPDF } from 'jspdf'
-import DataContext from '../context/DataContext';
 
 const InvoiceModel = ({
   isOpen,

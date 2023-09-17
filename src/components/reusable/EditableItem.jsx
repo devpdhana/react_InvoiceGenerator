@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
-import DataContext from "../context/DataContext";
 
 const EditableItem = ({ currency,cellData, handleEditItem }) => {
 
